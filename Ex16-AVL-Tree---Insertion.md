@@ -1,61 +1,176 @@
-# Ex4A AVL Tree - Insertion
-## DATE: 
+# Ex16 AVL Tree - Insertion
+## DATE:
 ## AIM:
 To write a C function to insert the elements in an AVL Tree.
 
 ## Algorithm
-1.	Start
-2.	If the node is NULL, create a new node with value x.
-3.	Insert x recursively into the left or right subtree based on comparison.
-4.	Calculate the balance factor (BF) after insertion.
-5.	If BF is -2 or 2, perform appropriate rotations (RR, RL, LL, or LR).
-6.	Update the height of the current node.
-7.	Return the new root after insertion and balancing..
-8.	End
+1.Start the program
+2.Define structure for AVL node (data, left, right, height)
+3.Insert element like BST insertion
+4.Update height of the node
+5.Calculate balance factor
+6.Perform rotations if unbalanced:
+7.Left Rotation
+8.Right Rotation
+9.Left-Right Rotation
+10.Right-Left Rotation
+11.Display tree using inorder traversal
+12.Stop   
 
 ## Program:
 ```
 /*
-Program to insert the elements in an AVL Tree
+Program to insert elements in AVL Tree
 Developed by: AATHI.S
-RegisterNumber: 212223220001
-
-node* insert(node*T,int x)
-{
-if(T==NULL)
-{
-T=(node*)malloc(sizeof(node)); T->data=x;
-T->left=NULL; T->right=NULL;
-}
-else
-if(x>T->data)
-{
-T->right=insert(T->right,x); if(BF(T)==-2)
-{
-if(x>T->right->data) T=RR(T);
-else
-T=RL(T);
-}
-}
-else
-if(x<T->data)
-{
- 
-T->left=insert(T->left,x); if(BF(T)==2)
-{
-if(x<T->left->data) T=LL(T);
-else
-T=LR(T);
-}
-}
-T->ht=height(T); return(T);
-}
-
+RegisterNumber:  212223220001
 */
+
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node
+{
+    int data;
+    struct node *left, *right;
+    int height;
+};
+
+// Get height
+int height(struct node *n)
+{
+    if(n == NULL)
+        return 0;
+    return n->height;
+}
+
+// Max of two numbers
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
+// Create new node
+struct node* newNode(int data)
+{
+    struct node* node = (struct node*)malloc(sizeof(struct node));
+    node->data = data;
+    node->left = node->right = NULL;
+    node->height = 1;
+    return node;
+}
+
+// Right rotation
+struct node* rightRotate(struct node* y)
+{
+    struct node* x = y->left;
+    struct node* T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+// Left rotation
+struct node* leftRotate(struct node* x)
+{
+    struct node* y = x->right;
+    struct node* T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+// Get balance factor
+int getBalance(struct node* n)
+{
+    if(n == NULL)
+        return 0;
+    return height(n->left) - height(n->right);
+}
+
+// Insert into AVL
+struct node* insert(struct node* node, int data)
+{
+    if(node == NULL)
+        return newNode(data);
+
+    if(data < node->data)
+        node->left = insert(node->left, data);
+    else if(data > node->data)
+        node->right = insert(node->right, data);
+    else
+        return node;
+
+    node->height = 1 + max(height(node->left), height(node->right));
+
+    int balance = getBalance(node);
+
+    // Left Left
+    if(balance > 1 && data < node->left->data)
+        return rightRotate(node);
+
+    // Right Right
+    if(balance < -1 && data > node->right->data)
+        return leftRotate(node);
+
+    // Left Right
+    if(balance > 1 && data > node->left->data)
+    {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    // Right Left
+    if(balance < -1 && data < node->right->data)
+    {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    return node;
+}
+
+// Inorder traversal
+void inorder(struct node* root)
+{
+    if(root != NULL)
+    {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+int main()
+{
+    struct node* root = NULL;
+
+    root = insert(root, 10);
+    root = insert(root, 20);
+    root = insert(root, 30);
+    root = insert(root, 40);
+    root = insert(root, 50);
+    root = insert(root, 25);
+
+    printf("Inorder Traversal of AVL Tree:\n");
+    inorder(root);
+
+    return 0;
+}
 ```
 
 ## Output:
-![image](https://github.com/user-attachments/assets/b2b62ca0-8585-46d5-a9b5-a6734b2243c4)
+<img width="508" height="297" alt="image" src="https://github.com/user-attachments/assets/4419d0ab-29f5-4b2d-82a5-0c1208ad9715" />
+
 
 
 ## Result:
